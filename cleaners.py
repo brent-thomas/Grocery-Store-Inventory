@@ -14,6 +14,7 @@ def clean_price(price_string):
     else:
         return price_float
     
+    
 def clean_date(date_string):
     try:
         split_date = date_string.split('/')
@@ -45,5 +46,27 @@ def clean_quantity(qty_string):
             \r*********************''')
     else:
         return  qty
+    
+    
+def clean_id(id_string, options):
+    try:
+        product_id = int(id_string)
+    except ValueError:
+        input('''
+            \n***** ID ERROR *****
+            \r The ID should be a number
+            \r Press Enter to try again
+            \r*********************''')
+        return
+    else:
+        if product_id in options:
+            return product_id
+        else:
+            input(f'''
+            \n***** ID ERROR *****
+            \r Options: {options}
+            \rPress Enter to try again
+            \r*********************''')
+            return
 
     
