@@ -4,15 +4,16 @@ def clean_price(price_string):
     try:
         split_price = price_string.split('$')
         price_float = float(split_price[1])
-    except ValueError:
+    except (ValueError, IndexError):
         input('''
             \n***** PRICE ERROR *****
             \r The price should be a number with a currency symbol.
             \r Ex: $21.99
             \n Press Enter to try again
             \r*********************''')
+        return None
     else:
-        return price_float
+        return int(price_float * 100)
     
     
 def clean_date(date_string):
@@ -30,7 +31,7 @@ def clean_date(date_string):
             \n Press Enter to try again
             \r*********************
             \r''')
-        return
+        return None
     else:
         return return_date
 
@@ -44,6 +45,7 @@ def clean_quantity(qty_string):
             \r Ex: 5
             \rPress Enter to try again
             \r*********************''')
+        return None
     else:
         return  qty
     
