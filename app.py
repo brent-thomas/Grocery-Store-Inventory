@@ -143,7 +143,9 @@ def add_product():
 
 def inventory_analysis():
     total_inventory = sum(product.product_quantity for product in session.query(Product.product_quantity).all())
+    sum_total_prices = sum(product.product_price for product in session.query(Product.product_price).all())
     total_products = session.query(Product).count()
+    avg_price = round((sum_total_prices/total_products)/100,2)
     most_expensive_product = session.query(Product).order_by(Product.product_price.desc()).first()
     least_expensive_product = session.query(Product).order_by(Product.product_price.asc()).first()
     brand_with_most_inventory = session.query(
@@ -154,12 +156,13 @@ def inventory_analysis():
         .order_by(desc('total_quantity')) \
         .first()
     print(f'''\n{'-'*40}\nINVENTORY ANALYSIS
-        \nMost Expensive Product: {most_expensive_product.product_name} - ${most_expensive_product.product_price}
-        \rLeast Expensive Product: {least_expensive_product.product_name} - ${least_expensive_product.product_price}
+        \nMost Expensive Product: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}
+        \rLeast Expensive Product: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}
         \rBrand With Most Inventory: {brand_with_most_inventory[0]} - Total Qty: {brand_with_most_inventory[1]}
-        \rTotal Inventory Across All Brands: {total_inventory})
-        \rAverage Price Across All Products: 
+        \rTotal Items In Inventory: {total_inventory}
+        \rAverage Product Price: {avg_price}
         \n{'-'*40}''')
+    input('Press Enter To Return To Main Menu')
     
 def backup_database_to_csv():
     # Backup Brands
@@ -176,9 +179,12 @@ def backup_database_to_csv():
         writer = csv.writer(csvfile)
         writer.writerow(['product_name','product_price', 'product_quantity', 'date_updated', 'brand_name'])  # Header
         for product in products:
+            formatted_date = str(product.date_updated)
+            formatted_date = formatted_date.split('-')
+            formatted_date = f'{formatted_date[1]}/{formatted_date[2]}/{formatted_date[0]}'
             brand_name = session.query(Brand).filter(Brand.brand_id == product.brand_id).first()
             formatted_price = f'${product.product_price}'
-            writer.writerow([product.product_name, formatted_price, product.product_quantity, product.date_updated, brand_name.brand_name])
+            writer.writerow([product.product_name, formatted_price, product.product_quantity, formatted_date, brand_name.brand_name])
 
     print("Backups saved to 'brands_backup.csv' and 'products_backup.csv'")
 
@@ -188,9 +194,9 @@ def menu():
         print(f'''\n***Grocery Inventory V1***
             \r
             \rV) VIEW PRODUCT DETAILS
-            \rN) ADD A PRODUCT 
-            \rA) VIEW ANALYSIS  
-            \rB) BACKUP 
+            \rN) ADD A NEW PRODUCT 
+            \rA) VIEW INVENTORY ANALYSIS  
+            \rB) BACKUP INVENTORY  
             \rX) EXIT  ''')
         choice = input('\nWhat would you like to do? ')
         if choice.upper() in ['V', 'N', 'A', 'B', 'X']:
